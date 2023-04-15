@@ -2,27 +2,81 @@ package book.manage;
 
 import book.manage.entity.Book;
 import book.manage.entity.Student;
-import book.manage.mapper.BookMapper;
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import book.manage.sql.SqlUtil;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.Scanner;
 
 /**
  * @author ach
  */
 public class Main {
-    public static void main(String[] args) throws IOException {
-        String resource = "mybatis-config.xml";
-        InputStream inputStream = Resources.getResourceAsStream(resource);
-        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-        try (SqlSession session = sqlSessionFactory.openSession(true)) {
-            BookMapper mapper = session.getMapper(BookMapper.class);
-            System.out.println(mapper.addStudent(new Student("小蓝", "男", 95)));
-            System.out.println(mapper.addBook(new Book("Thinking in Java", "written by Buce", 50.00)));
+    public static void main(String[] args) {
+        try (Scanner scanner = new Scanner(System.in)) {
+            while (true) {
+                System.out.println("===================");
+                System.out.println("1. 录入学生信息");
+                System.out.println("2. 录入书籍信息");
+                System.out.println("请输入您想要执行的操作（输入Q/q退出）：");
+                String input;
+                try {
+                    input = scanner.nextLine();
+                } catch (Exception e) {
+                    return;
+                }
+                char c = input.charAt(0);
+                switch (c) {
+                    case '1':
+                        addStudent(scanner);
+                        break;
+                    case '2':
+                        addBook(scanner);
+                        break;
+                    case 'Q':
+                    case 'q':
+                        return;
+                    default:
+                        System.out.println("输入信息有误，请重新输入");
+                        break;
+                }
+            }
         }
+    }
+
+    private static void addStudent(Scanner scanner) {
+        System.out.println("请输入学生姓名：");
+        String name = scanner.nextLine();
+        System.out.println("请输入学生性别（男/女)：");
+        String sex = scanner.nextLine();
+        System.out.println("请输入学生年级：");
+        String grade = scanner.nextLine();
+        int g = Integer.parseInt(grade);
+        Student student = new Student(name, sex, g);
+        SqlUtil.doSqlwork(mapper -> {
+            int i = mapper.addStudent(student);
+            if (i > 0) {
+                System.out.println("学生信息录入成功！");
+            } else {
+                System.out.println("学生信息录入失败，请重试！");
+            }
+        });
+    }
+
+    private static void addBook(Scanner scanner) {
+        System.out.println("请输入书籍标题：");
+        String title = scanner.nextLine();
+        System.out.println("请输入书籍简介：：");
+        String description = scanner.nextLine();
+        System.out.println("请输入书籍价格：");
+        String price = scanner.nextLine();
+        double p = Double.parseDouble(price);
+        Book book = new Book(title, description, p);
+        SqlUtil.doSqlwork(mapper -> {
+            int i = mapper.addBook(book);
+            if (i > 0) {
+                System.out.println("书籍信息录入成功！");
+            } else {
+                System.out.println("书籍信息录入失败，请重试！");
+            }
+        });
     }
 }
