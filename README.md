@@ -15,3 +15,4 @@
     *
     新建java项目，配置maven依赖，新建mybaits-config.xml配置文件，可参考[mybaits入门](https://mybatis.org/mybatis-3/zh/getting-started.html)
     ，连接数据库，创建实体类，配置映射器，测试插入
+2. 开发功能
